@@ -74,8 +74,8 @@ test_file = open('test.csv', 'rb')
 test_file_object = csv.reader(test_file)
 header = test_file_object.next()
 
-# Also open the a new file so I can write to it. 
-predictions_file = open("genderclassmodel.csv", "wb")
+# Also open the a new file so I can write to it.
+predictions_file = open("../genderclassmodel.csv", "wb")
 predictions_file_object = csv.writer(predictions_file)
 predictions_file_object.writerow(["PassengerId", "Survived"])
 
