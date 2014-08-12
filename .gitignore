@@ -1,2 +1,5 @@
 # Office Temp Files
 ~$*
+
+# Python artifacts
+*.pyc

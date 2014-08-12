@@ -9,16 +9,17 @@ import pandas as pd
 import numpy as np
 import csv as csv
 from sklearn.ensemble import RandomForestClassifier
+import clean
 
 # Data cleanup
 # TRAIN DATA
-train_df = pd.read_csv('../data/train.csv', header=0)        # Load the train file into a dataframe
+train_df = pd.read_csv('data/train.csv', header=0)        # Load the train file into a dataframe
 
 # I need to convert all strings to integer classifiers.
 # I need to fill in the missing values of the data and make it complete.
 
 # female = 0, Male = 1
-train_df['Gender'] = train_df['Sex'].map( {'female': 0, 'male': 1} ).astype(int)
+train_df['Gender'] = clean.CleanGender(train_df['Sex'])
 
 # Embarked from 'C', 'Q', 'S'
 # Note this is not ideal: in translating categories to numbers, Port "2" is not 2 times greater than Port "1", etc.
@@ -32,16 +33,20 @@ Ports_dict = { name : i for i, name in Ports }
 train_df.Embarked = train_df.Embarked.map( lambda x: Ports_dict[x]).astype(int)
 
 # All the ages with no data -> make the median of all Ages
-median_age = train_df['Age'].dropna().median()
 if len(train_df.Age[ train_df.Age.isnull() ]) > 0:
-	train_df.loc[ (train_df.Age.isnull()), 'Age'] = median_age
+	median_age_class = np.zeros(3)
+	for f in range(0,3):
+		median_age_class[f] = train_df[ train_df.Pclass == f+1 ]['Age'].dropna().median()
+
+	for f in range(0,3):
+		train_df.loc[ (train_df.Age.isnull()) & (train_df.Pclass == f+1 ), 'Age'] = median_age_class[f]
 
 # Remove the Name column, Cabin, Ticket, and Sex (since I copied and filled it to Gender)
 train_df = train_df.drop(['Name', 'Sex', 'Ticket', 'Cabin', 'PassengerId'], axis=1)
 
 
 # TEST DATA
-test_df = pd.read_csv('../data/test.csv', header=0)        # Load the test file into a dataframe
+test_df = pd.read_csv('data/test.csv', header=0)        # Load the test file into a dataframe
 
 # I need to do the same with the test data now, so that the columns are the same as the training data
 # I need to convert all strings to integer classifiers:
@@ -58,9 +63,14 @@ test_df.Embarked = test_df.Embarked.map( lambda x: Ports_dict[x]).astype(int)
 
 
 # All the ages with no data -> make the median of all Ages
-median_age = test_df['Age'].dropna().median()
-if len(test_df.Age[ test_df.Age.isnull() ]) > 0:
-	test_df.loc[ (test_df.Age.isnull()), 'Age'] = median_age
+if len(train_df.Age[ train_df.Age.isnull() ]) > 0:
+	median_age_class = np.zeros(3)
+	for f in range(0,3):
+		median_age_class[f] = train_df[ train_df.Pclass == f+1 ]['Age'].dropna().median()
+
+	for f in range(0,3):
+		train_df.loc[ (train_df.Age.isnull()) & (train_df.Pclass == f+1 ), 'Age'] = median_age_class[f]
+
 
 # All the missing Fares -> assume median of their respective class
 if len(test_df.Fare[ test_df.Fare.isnull() ]) > 0:

@@ -20,10 +20,8 @@ fare_bracket_size = 10
 number_of_fares = fare_ceiling // fare_bracket_size
 number_of_classes = 3 #There were 1st, 2nd and 3rd classes on board
 
-data = pd.read_csv('train.csv',skipinitialspace=1,index_col=[0])
-AddBinFare(data,
-           fare_bracket_size=fare_bracket_size,
-           number_of_fares=number_of_fares)
+data = pd.read_csv('data/train.csv',skipinitialspace=1,index_col=[0])
+AddBinFare(data, fare_bracket_size=fare_bracket_size, number_of_fares=number_of_fares)
 
 # This reference table will show we the proportion of survivors as a function of
 # Gender, class and ticket fare.
@@ -53,7 +51,7 @@ survival_table = (pd.Series(survival_list,
 print survival_table.values
 
 # Read the test file
-test = pd.read_csv('test.csv',index_col=[0])
+test = pd.read_csv('data/test.csv',index_col=[0])
 
 # Calculate the bin fare
 AddBinFare(test, fare_bracket_size=fare_bracket_size, number_of_fares=number_of_fares)
